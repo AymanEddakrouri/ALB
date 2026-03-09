@@ -84,7 +84,7 @@ const Navbar: React.FC<{ lang: 'ar' | 'en'; toggleLang: () => void }> = ({ lang,
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const navLinks = [
-    { name: 'الرئيسية', path: '/', icon: Home },
+    { name: 'الرئيسة', path: '/', icon: Home },
     { name: 'المكتبة اللسانية', path: '/library', icon: BookOpen },
     { name: 'بنك الكتابة العلمية', path: '/writing-bank', icon: PenTool },
     { name: 'مساعد الصياغة الذكي', path: '/paraphraser', icon: Wand2 },
