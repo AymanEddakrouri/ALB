@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>بنك اللغة العربية - منصة علمية معرفية</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+      :root {
+        --font-main: 'Cairo', sans-serif;
+        --font-academic: 'Amiri', serif;
+        --font-trendy: 'IBM Plex Sans Arabic', sans-serif;
+      }
+
+      body {
+        font-family: var(--font-main);
+        background-color: #ffffff;
+        color: #1e293b;
+        line-height: 1.6;
+      }
+
+      .academic-font {
+        font-family: var(--font-academic);
+      }
+
+      .trendy-font {
+        font-family: var(--font-trendy);
+      }
+
+      .title-h1 {
+        font-family: var(--font-academic);
+        font-weight: 900;
+      }
+
+      .title-h2 {
+        font-family: var(--font-trendy);
+        font-weight: 700;
+      }
+
+      .text-body {
+        font-family: var(--font-main);
+        font-weight: 400;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f8fafc;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
+
+      /* Floating animations */
+
+      @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+      }
+
+      @keyframes float-slow {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(10px, -10px) rotate(5deg); }
+        66% { transform: translate(-5px, 5px) rotate(-5deg); }
+        100% { transform: translate(0, 0) rotate(0deg); }
+      }
+
+      .floating-badge {
+        animation: float 4s ease-in-out infinite;
+      }
+
+      .footer-letter {
+        animation: float-slow 8s ease-in-out infinite;
+      }
+
+      .ltr-text {
+        direction: ltr;
+        display: inline-block;
+      }
+
+      /* ================================= */
+      /* Testimonials Marquee Animation */
+      /* ================================= */
+
+      .marquee-container {
+        display: flex;
+        width: max-content;
+        gap: 2rem;
+        animation: marquee-scroll 160s linear infinite;
+      }
+
+      /* إيقاف الحركة عند مرور الماوس */
+
+      .marquee-container:hover {
+        animation-play-state: paused;
+      }
+
+      @keyframes marquee-scroll {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <div id="root"></div>
+
+    <script type="module" src="/index.tsx"></script>
+
+  </body>
+</html>
