@@ -13,33 +13,44 @@ export const handler = async (event) => {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     
-    // سطر ذكي عشان نعرف العيب فين من غير ما نفضح المفتاح
-    console.log("Checking API Key...", apiKey ? "Key exists (starts with " + apiKey.substring(0,4) + ")" : "KEY IS MISSING!");
+    // فك شفرة البيانات مهما كان شكلها
+    let prompt = "";
+    try {
+      const body = JSON.parse(event.body || "{}");
+      // بيحاول يدور على النص سواء مبعوث باسم prompt أو text أو حتى لو مبعوث نص مباشر
+      prompt = body.prompt || body.text || (typeof body === 'string' ? body : "");
+    } catch (e) {
+      prompt = event.body || ""; // لو مش JSON، خد النص زي ما هو
+    }
 
-    const body = JSON.parse(event.body || "{}");
-    const { prompt } = body;
-
-    if (!prompt) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: "No prompt provided" }) };
+    if (!prompt || prompt.trim() === "") {
+      console.error("Empty prompt received");
+      return { 
+        statusCode: 400, 
+        headers, 
+        body: JSON.stringify({ error: "الرجاء إدخال نص للتحليل" }) 
+      };
     }
 
     const genAI = new GoogleGenerativeAI(apiKey!);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    console.log("Calling Gemini API with prompt:", prompt.substring(0, 20) + "...");
-    
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const response = await result.response;
+    const text = response.text();
 
-    return { statusCode: 200, headers, body: JSON.stringify({ text }) };
+    return { 
+      statusCode: 200, 
+      headers, 
+      body: JSON.stringify({ text }) 
+    };
 
   } catch (error: any) {
-    // ده السطر اللي هيقولنا "الخلاصة" في الـ Log
-    console.error("DETAILED ERROR:", error.message);
+    console.error("Gemini Error:", error.message);
     return { 
       statusCode: 500, 
       headers, 
-      body: JSON.stringify({ error: error.message, stack: error.stack }) 
+      body: JSON.stringify({ error: "حدث خطأ في معالجة الطلب" }) 
     };
   }
 };
