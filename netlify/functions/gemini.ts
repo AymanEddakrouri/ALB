@@ -12,9 +12,8 @@ export const handler = async (event) => {
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
+    // استخدام الموديل gemini-pro يحل مشكلة الـ 404 تماماً
     const genAI = new GoogleGenerativeAI(apiKey!);
-    
-    // غيرنا الموديل لـ gemini-pro لأنه الأكثر استقراراً مع المكتبات المختلفة
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     let prompt = "";
@@ -25,24 +24,15 @@ export const handler = async (event) => {
       prompt = event.body || "";
     }
 
-    if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ error: "No prompt" }) };
+    if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ error: "Empty prompt" }) };
 
-    // طلب المحتوى
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ text }),
-    };
+    return { statusCode: 200, headers, body: JSON.stringify({ text }) };
   } catch (error: any) {
     console.error("DETAILED ERROR:", error.message);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message }),
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
 };
