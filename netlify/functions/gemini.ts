@@ -6,48 +6,53 @@ export const handler = async (event) => {
     "Content-Type": "application/json"
   };
 
-  if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers, body: "" };
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
+  }
 
   try {
     const apiKey = (process.env.GEMINI_API_KEY || "").trim();
-    if (!apiKey) throw new Error("KEY_MISSING");
+    if (!apiKey) throw new Error("GEMINI_API_KEY missing");
 
     const body = JSON.parse(event.body || "{}");
     const prompt = body.prompt || body.text || "Explain Arabic grammar in one sentence";
 
-    // رابط مباشر وجديد كلياً
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
+        contents: [
+          {
+            parts: [{ text: prompt }]
+          }
+        ]
       })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      // لو جوجل رفضت، هنعرف السبب بالظبط
-      const msg = data.error?.message || "Unknown Google Error";
-      throw new Error(`Google_Says: ${msg}`);
+      throw new Error(data.error?.message || "Google API Error");
     }
 
-    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response text";
+    const aiText =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "No response returned";
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ text: aiText }),
+      body: JSON.stringify({ text: aiText })
     };
 
-  } catch (error: any) {
-    console.error("DEBUG:", error.message);
+  } catch (error) {
+    console.error("Function error:", error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
