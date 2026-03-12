@@ -1,5 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export const handler = async (event) => {
   const headers = {
     "Access-Control-Allow-Origin": "*",
@@ -12,10 +10,7 @@ export const handler = async (event) => {
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    // استخدام الموديل gemini-pro يحل مشكلة الـ 404 تماماً
-    const genAI = new GoogleGenerativeAI(apiKey!);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
+    
     let prompt = "";
     try {
       const body = JSON.parse(event.body || "{}");
@@ -26,13 +21,37 @@ export const handler = async (event) => {
 
     if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ error: "Empty prompt" }) };
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // استدعاء مباشر لرابط جوجل المستقر (Stable API)
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    return { statusCode: 200, headers, body: JSON.stringify({ text }) };
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || "Google API Error");
+    }
+
+    const aiText = data.candidates[0].content.parts[0].text;
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ text: aiText }),
+    };
+
   } catch (error: any) {
-    console.error("DETAILED ERROR:", error.message);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
+    console.error("FINAL DEBUG ERROR:", error.message);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 };
