@@ -19,10 +19,11 @@ export const handler = async (event) => {
       prompt = event.body || "";
     }
 
-    if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ error: "Empty prompt" }) };
+    // تغيير بسيط في النص لإجبار نيتليفاي على التحديث
+    if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ error: "Please provide a valid text" }) };
 
-    // التغيير السحري هنا: استخدمنا gemini-pro بدل gemini-1.5-flash
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
+    // العودة للموديل الأحدث بما أن المفتاح جديد
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -35,7 +36,6 @@ export const handler = async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      // لو لسه فيه خطأ، هيطبع لنا الرسالة اللي جاية من جوجل بالظبط
       throw new Error(data.error?.message || "Google API Error");
     }
 
@@ -48,7 +48,7 @@ export const handler = async (event) => {
     };
 
   } catch (error: any) {
-    console.error("FINAL ATTEMPT ERROR:", error.message);
+    console.error("FORCED DEPLOY ERROR:", error.message);
     return {
       statusCode: 500,
       headers,
