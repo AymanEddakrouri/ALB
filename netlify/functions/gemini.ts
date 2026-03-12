@@ -21,8 +21,8 @@ export const handler = async (event) => {
 
     if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ error: "Empty prompt" }) };
 
-    // استدعاء مباشر لرابط جوجل المستقر (Stable API)
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // التغيير السحري هنا: استخدمنا gemini-pro بدل gemini-1.5-flash
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -35,6 +35,7 @@ export const handler = async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
+      // لو لسه فيه خطأ، هيطبع لنا الرسالة اللي جاية من جوجل بالظبط
       throw new Error(data.error?.message || "Google API Error");
     }
 
@@ -47,7 +48,7 @@ export const handler = async (event) => {
     };
 
   } catch (error: any) {
-    console.error("FINAL DEBUG ERROR:", error.message);
+    console.error("FINAL ATTEMPT ERROR:", error.message);
     return {
       statusCode: 500,
       headers,
