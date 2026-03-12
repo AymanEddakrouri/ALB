@@ -9,16 +9,14 @@ export const handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers, body: "" };
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    // التحقق من وجود المفتاح في الـ Log عشان نقطع الشك باليقين
-    if (!apiKey) throw new Error("API KEY IS MISSING IN NETLIFY SETTINGS");
+    const apiKey = (process.env.GEMINI_API_KEY || "").trim();
+    if (!apiKey) throw new Error("KEY_MISSING");
 
     const body = JSON.parse(event.body || "{}");
-    const prompt = body.prompt || body.text || "مرحبا";
+    const prompt = body.prompt || body.text || "Explain Arabic grammar in one sentence";
 
-    // ده الرابط النهائي والأكثر استقراراً في العالم حالياً
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
+    // رابط مباشر وجديد كلياً
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -31,10 +29,12 @@ export const handler = async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || "Google API Error");
+      // لو جوجل رفضت، هنعرف السبب بالظبط
+      const msg = data.error?.message || "Unknown Google Error";
+      throw new Error(`Google_Says: ${msg}`);
     }
 
-    const aiText = data.candidates[0].content.parts[0].text;
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response text";
 
     return {
       statusCode: 200,
@@ -43,7 +43,7 @@ export const handler = async (event) => {
     };
 
   } catch (error: any) {
-    console.error("THE FINAL ERROR:", error.message);
+    console.error("DEBUG:", error.message);
     return {
       statusCode: 500,
       headers,
