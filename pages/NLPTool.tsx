@@ -8,7 +8,10 @@ const NLPTool: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleAnalyze = async () => {
-    if (!inputText.trim()) return;
+
+  console.log("ANALYZE BUTTON CLICKED");
+
+  if (!inputText.trim()) return;
 
     setIsProcessing(true);
 
