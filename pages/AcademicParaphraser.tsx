@@ -30,10 +30,10 @@ const AcademicParaphraser: React.FC = () => {
 
       const data = await response.json();
 
-      if (data.result) {
-        setOutputText(data.result);
+      if (data.text) {
+        setOutputText(data.text);
       } else {
-        setOutputText("لم نتمكن من إعادة صياغة النص حالياً.");
+        setOutputText("لم نتمكن من إعادة صياغة النص حاليًا.");
       }
 
     } catch (error) {

@@ -27,8 +27,8 @@ const NLPTool: React.FC = () => {
 
       const data = await response.json();
 
-      if (data.result) {
-        setAnalysis(data.result);
+      if (data.text) {
+        setAnalysis(data.text);
       } else {
         setAnalysis("لم يتمكن المحلل اللساني من معالجة النص.");
       }

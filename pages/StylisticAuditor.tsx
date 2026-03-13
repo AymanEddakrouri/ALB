@@ -30,10 +30,10 @@ const StylisticAuditor: React.FC = () => {
 
       const data = await response.json();
 
-      if (data.result) {
-        setAnalysis(data.result);
+      if (data.text) {
+        setAnalysis(data.text);
       } else {
-        setAnalysis("تعذر تحليل النص حالياً.");
+        setAnalysis("تعذر تحليل النص حاليًا.");
       }
 
     } catch (error) {
