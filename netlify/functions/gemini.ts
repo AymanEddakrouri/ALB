@@ -9,7 +9,7 @@ export default async (request: Request, context: Context) => {
     "Content-Type": "application/json"
   });
 
-  // 1. التعامل مع طلبات الـ OPTIONS (Preflight)
+  // 1. التعامل مع طلبات الـ OPTIONS
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers });
   }
@@ -23,18 +23,17 @@ export default async (request: Request, context: Context) => {
   }
 
   try {
-    // 3. جلب المفتاح السري من بيئة نيتليفاي
+    // 3. جلب المفتاح السري
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("GEMINI_API_KEY missing");
 
-    // 4. قراءة البيانات المرسلة من الموقع
+    // 4. قراءة البيانات المرسلة
     const body = await request.json().catch(() => ({}));
     const prompt = body.prompt || body.text || "مرحباً، هل يمكنك مساعدتي؟";
 
-    // 5. استدعاء Gemini API (استخدام موديل 1.5 فلاش المستقر)
-    // تم تغيير الإصدار إلى v1 والموديل إلى gemini-1.5-flash لضمان قبول الكوتا المجانية
+    // 5. استدعاء Gemini API باستخدام v1beta (الإصدار الأضمن للموديلات الحديثة)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -51,7 +50,6 @@ export default async (request: Request, context: Context) => {
     const data = await response.json();
 
     if (!response.ok) {
-      // إرسال تفاصيل الخطأ القادم من جوجل للمساعدة في التشخيص
       throw new Error(data.error?.message || `Google API Error: ${response.status}`);
     }
 
